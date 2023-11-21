@@ -1,5 +1,6 @@
 import "server" as *
 
 let home(req,res) = do
-    res.template("home.html",{})
+    
+    res.template("people.html",{})
 app.get("/", home)
