@@ -1,0 +1,144 @@
+import "users.ar" as *
+
+let christmasList = {}
+let accounts = []
+let indexes = {username: {}, email: {}, id: {}}
+let savePath = path.join([program.cwd, 'data', "packages-db.json"])
+
+let changes = {n: 0, last: 0}
+
+let validName(name) = do
+    if (name.length < 3) return false
+    if (name.length > 32) return false
+    for (i from 0 to name.length) do
+        if (name[i] not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-.") return false
+    return true
+
+let makeChange() = changes.n += 1
+
+let makePassword(length) = do
+    let chars = "1234567890"
+    let str = []
+    for (i from 0 to length) do
+        str.append(chars[random.int(0, chars.length-1)])
+    return str.join("")
+
+let randstr(length) = do
+    let chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    let str = []
+    for (i from 0 to length) do
+        str.append(chars[random.int(0, chars.length-1)])
+    return str.join("")
+
+let load() = do
+    if (path.exists(savePath)) do
+        let file = file.read(savePath)
+        data = file.json()||{}
+        christmasList = data.christmasList
+        accounts = data.accounts
+        file.close()
+
+let forceSave() = do
+    makeChange()
+    save()
+
+let save() = do
+    if (changes.n == changes.last) return
+    changes.last = changes.n
+    let file = file.write(savePath)
+    file.json({christmasList: christmasList, accounts: accounts})
+    file.close()
+
+let saveThread() = do
+    forever do
+        try do
+            save()
+        catch (e) do
+            term.log(e)
+        time.snooze(10)
+
+let account = {}
+
+account.addToIndexes(acc, index) = do
+    indexes.id[acc.id] = index
+    indexes.username[acc.username] = index
+
+account.getByUsername(username) = do
+    if (username in indexes.username) return accounts[indexes.username[username]]
+    for (i from 0 to accounts.length) do
+        if (accounts[i].username == username) do
+            account.addToIndexes(accounts[i], i)
+            return accounts[i]
+    return null
+
+account.makeId() = do
+    let id = "u-"+randstr(32)
+    if (account.getById(id) != null) return account.makeId()
+    return id
+
+account.getById(id) = do
+    if (id in indexes.id) return accounts[indexes.id[id]]
+    for (i from 0 to accounts.length) do
+        if (accounts[i].id == id) do
+            account.addToIndexes(accounts[i], i)
+            return accounts[i]
+    return null
+
+account.getByToken(token) = do
+    let split = token.splitN("|", 2)
+    if (split.length != 2) return null
+    let id = split[0]
+    let token = split[1]
+    let acc = account.getById(id)
+    if (acc == null) return null
+    if (token not in acc.tokens) return null
+    return acc
+
+account.deleteToken(token) = do
+    let split = token.split("|")
+    if (split.length != 2) return false
+    let id = split[0]
+    let token = split[1]
+    let acc = account.getById(id)
+    if (acc == null) return false
+    if (token not in acc.tokens) return false
+    acc.tokens = acc.tokens.filter((t) = t != token)
+    forceSave()
+    return true
+
+account.makeToken(acc) = do
+    let token = randstr(100)
+    acc.tokens.append(token)
+    makeChange()
+    return acc.id+"|"+token
+
+account.saltHash(password, salt) = sha256(password+salt)
+
+
+account.create(username, password) = do
+    let id = account.makeId()
+    let acc = {id: id, username: username, password: password, tokens: []}
+    accounts.append(acc)
+    forceSave()
+    return acc
+
+account.login(user, password) = do
+    let acc = account.getByUsername(user)
+    if (acc == null) return {error: "Icorrect username or email"}
+    let hash = account.saltHash(password, acc.salt)
+    if (hash != acc.password) return {error: "Incorrect password"}
+    return {token: account.makeToken(acc)}
+
+
+load()
+t = thread(saveThread)
+t.start()
+
+for (i from 0 to users.length) do
+    let user = users[i]
+    let acc = account.getByUsername(user)
+    if (acc == null) do
+        let password = makePassword(3)
+        acc = account.create(user, password)
+        term.log("Created account",user)
+        term.log("Password:",password)

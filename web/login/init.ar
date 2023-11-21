@@ -1,0 +1,5 @@
+import "server" as *
+
+let login(req,res) = do
+    res.template("login.html", {})
+app.all("/login", login)
