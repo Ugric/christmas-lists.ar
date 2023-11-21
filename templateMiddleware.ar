@@ -1,0 +1,5 @@
+import "http.ar/renderTemplate" as t
+
+let templater(req,res) = do
+    res.template(filename, values) = res.renderTemplate("index.html", {content: t.renderTemplate(filename, values)})
+    res.next()

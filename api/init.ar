@@ -1,0 +1,8 @@
+import "server" as *
+
+let api(req,res) = do
+    let data = []
+    for (i from 0 to 10) do
+        data.append({id: i, name: "name" + i})
+    res.json(data)
+app.get("/api", api)

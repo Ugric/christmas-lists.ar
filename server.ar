@@ -1,0 +1,9 @@
+import "http.ar" as http
+import "http.ar/logger" as *
+import "templateMiddleware.ar" as *
+
+let app = http.server()
+app.use(templater)
+app.use(logger)
+app.use(http.static("/","static"))
+app.port = 3000
