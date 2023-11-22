@@ -1,5 +1,22 @@
 import "server" as *
+import "database" as *
 
 let login(req,res) = do
+    let acc = account.getByToken(req.cookies.get_value("token", ""))
+    if (acc) return res.redirect("/")
+    let password = req.formdata.get_value("password")
+    let acc = null
+    if (password != null) do
+        for (i from 0 to accounts.length) do
+            if (accounts[i].password == password) do
+                acc = accounts[i]
+                break
+        if (acc) do
+            let token = account.makeToken(acc)
+            res.setCookie("token", {value:token, path:"/", expires:time.unix(time.now().unix()+3.156e+9, 0).format()})
+            return res.redirect("/")
+        else do
+            res.code = 401
+            res.template("login.html", {error: "Invalid password"})
     res.template("login.html", {})
 app.all("/login", login)

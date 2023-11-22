@@ -1,6 +1,6 @@
 import "users.ar" as *
 
-let christmasList = {}
+let christmasList = []
 let accounts = []
 let indexes = {username: {}, email: {}, id: {}}
 let savePath = path.join([program.cwd, 'data', "packages-db.json"])
@@ -121,13 +121,6 @@ account.create(username, password) = do
     accounts.append(acc)
     forceSave()
     return acc
-
-account.login(user, password) = do
-    let acc = account.getByUsername(user)
-    if (acc == null) return {error: "Icorrect username or email"}
-    let hash = account.saltHash(password, acc.salt)
-    if (hash != acc.password) return {error: "Incorrect password"}
-    return {token: account.makeToken(acc)}
 
 
 load()

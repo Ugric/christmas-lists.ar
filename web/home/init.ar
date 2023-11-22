@@ -1,6 +1,15 @@
 import "server" as *
+import "database" as *
+import "bleach.ar" as bleach
+import "url.ar" as url
 
 let home(req,res) = do
-    
-    res.template("people.html",{})
+    let acc = account.getByToken(req.cookies.get_value("token", ""))
+    if (not acc) return res.redirect("/login")
+    let people = []
+    for (i from 0 to accounts.length) do
+        let person = accounts[i]
+        if (person.id == acc.id) continue
+        people.append("<a class=\"link\" href=\"/list?"+url.queryStr({person:person.id})+"\">"+bleach.clean(person.username)+"</a>")
+    res.template("people.html",{name:acc.username, people:people.join("\n")})
 app.get("/", home)

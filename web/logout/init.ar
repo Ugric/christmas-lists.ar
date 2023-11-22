@@ -1,0 +1,8 @@
+import "server" as *
+import "database" as *
+
+let logout(req,res) = do
+    account.deleteToken(req.cookies.get_value("token", ""))
+    res.deleteCookie("token")
+    res.redirect("/login")
+app.get("/logout", logout)

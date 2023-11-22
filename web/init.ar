@@ -1,2 +1,4 @@
 import "home"
 import "login"
+import "logout"
+import "list"

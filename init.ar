@@ -2,8 +2,6 @@ import "database.ar"
 
 import "server" as *
 
-import "api"
-
 import "web"
 
 app.run()

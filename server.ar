@@ -5,6 +5,7 @@ import "templateMiddleware.ar" as *
 let app = http.server()
 app.use(templater)
 app.use(http.cookie)
+app.use(http.formdata)
 app.use(logger)
 app.use(http.static("/","static"))
 app.port = 3000
