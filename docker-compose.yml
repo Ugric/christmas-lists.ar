@@ -1,0 +1,10 @@
+version: '3.7'
+
+services:
+  server:
+    image: 'ugric/christmas-list-server:latest'
+    ports:
+      - '7020:3000'
+    volumes:
+      - './data:/christmas-list-server/data'
+    restart: unless-stopped
