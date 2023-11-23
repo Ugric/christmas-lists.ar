@@ -5,8 +5,21 @@
     <div class="people">{{%people}}</div>
 </div>
 
+
+<div class="container">
+    <h2><span class="title">Price Limit</span></h2>
+    <div class="line"></div>
+    <p>0 = no limit</p>
+    <form action="/list">
+    <input type="number" name="limit" value="{{limit}}">
+    <input type="text" style="display: none;" name="person" value="{{personID}}">
+    <input type="submit" value="Submit">
+    </form>
+</div>
+
 <div class="container">
     <h2><span class="title">List</span></h2>
+    <p>results for {{resultsFor}}</p>
     <div class="line"></div>
     <div class="people">{{%results}}</div>
 </div>

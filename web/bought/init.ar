@@ -1,0 +1,47 @@
+import "server" as *
+import "database" as *
+import "url.ar" as url
+
+let bought(req,res) = do
+    let acc = account.getByToken(req.cookies.get_value("token", ""))
+    if (not acc) return res.redirect("/login")
+    let limit = number(req.query.get_value("limit")||0)
+    let itemID = req.query.get_value("item")
+    if (not itemID) return res.redirect("/list?"+url.queryStr({limit:string(limit)}))
+    let item = null
+    for (i from 0 to christmasList.length) do
+        if (christmasList[i].id == itemID) do
+            item = christmasList[i]
+            break
+    if (not item) return res.redirect("/list?"+url.queryStr({limit:string(limit)}))
+    if (item.bought) return res.redirect("/list?"+url.queryStr({limit:string(limit)}))
+    let person = account.getById(item.owner)
+    res.template("bought.html",{username:person.username, title: item.title, price: string(item.price), link:item.link, personID: person.id, itemID:item.id, backLink:"/list?"+url.queryStr({limit:string(limit)})})
+app.get("/bought", bought)
+
+let postBought(req, res) = do
+    let acc = account.getByToken(req.cookies.get_value("token", ""))
+    if (not acc) return res.redirect("/login")
+    let itemID = req.formdata.get_value("item")
+    let person = account.getById(req.formdata.get_value("person"))
+    let item = null
+    for (i from 0 to christmasList.length) do
+        if (christmasList[i].id == itemID) do
+            item = christmasList[i]
+            break
+    if (not item) do
+        res.code = 400
+        return res.send("Invalid item")
+    if (not person) do
+        res.code = 400
+        return res.send("Invalid person")
+    if (item.owner == acc.id) do
+        res.code = 400
+        return res.send("You are the owner of this item")
+    if (item.bought) do
+        res.code = 400
+        return res.send("Item already bought")
+    item.bought = acc.id
+    makeChange()
+    return res.template("bought ticked off.html",{username:person.username, title: item.title, price: string(item.price), link:item.link})
+app.post("/bought", postBought)

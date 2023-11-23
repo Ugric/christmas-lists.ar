@@ -6,7 +6,7 @@ import "url.ar" as url
 let home(req,res) = do
     let acc = account.getByToken(req.cookies.get_value("token", ""))
     if (not acc) return res.redirect("/login")
-    let people = []
+    let people = ["<a class=\"link\" href=\"/list\">all</a>"]
     for (i from 0 to accounts.length) do
         let person = accounts[i]
         if (person.id == acc.id) continue

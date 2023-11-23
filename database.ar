@@ -127,11 +127,14 @@ load()
 t = thread(saveThread)
 t.start()
 
+
 for (i from 0 to users.length) do
     let user = users[i]
     let acc = account.getByUsername(user)
     if (acc == null) do
+        added += 1
         let password = makePassword(3)
         acc = account.create(user, password)
         term.log("Created account",user)
         term.log("Password:",password)
+        makeChange()

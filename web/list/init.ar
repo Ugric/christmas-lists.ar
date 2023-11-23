@@ -1,39 +1,27 @@
 import "server" as *
 import "database" as *
-import "bleach.ar" as bleach
 import "url.ar" as url
+import "giftTemplate" as *
 
 let list(req,res) = do
     let acc = account.getByToken(req.cookies.get_value("token", ""))
-    let limit = number(req.query.get_value("limit")||0)
-    let personQuery = req.query.get_value("person")
     if (not acc) return res.redirect("/login")
+    let limit = number(req.query.get_value("limit")||0)
+    let personQuery = req.query.get_value("person", "")
+    let person = account.getById(personQuery)
     let people = ["<a class=\"link\" href=\"/list?"+url.queryStr({limit:string(limit)})+"\">all</a>"]
     for (i from 0 to accounts.length) do
         let person = accounts[i]
         if (person.id == acc.id) continue
         people.append("<a class=\"link\" href=\"/list?"+url.queryStr({person:person.id, limit:string(limit)})+"\">"+bleach.clean(person.username)+"</a>")
-    let template(person, item) = do
-        let output = []
-        output.append("<div class=\"list_item\"><p>")
-        output.append(bleach.clean(person.username))
-        output.append(" wants to get...</p><h1>")
-        output.append(bleach.clean(item.title))
-        output.append("</h1><h2>£")
-        output.append(bleach.clean(string(item.price)))
-        output.append("</h2><a class=\"link\" href=\"")
-        output.append(bleach.clean(item.link))
-        output.append("\">")
-        output.append(bleach.clean(item.link))
-        output.append("</a></div>")
-        return output.join("")
     let results = []
     for (i from 0 to christmasList.length) do
         let item = christmasList[i]
         let person = account.getById(item.owner)
         if (person.id == acc.id) continue
+        if (item.bought) continue
         if (personQuery && person.id != personQuery) continue
         if (limit && item.price > limit) continue
-        results.append(template(person, item))
-    res.template("list.html",{name:acc.username, results:results.join("")||"No results", people: people.join("")})
+        results.append(giftTemplate(person, item))
+    res.template("list.html",{name:acc.username, results:results.join("")||"No results", people: people.join(""), personID:personQuery||"", resultsFor:(person && person.username)||"all", limit:limit||0})
 app.get("/list", list)

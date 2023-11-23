@@ -1,0 +1,23 @@
+import "server" as *
+import "database" as *
+import "bleach.ar" as bleach
+
+let addToList(req,res) = do
+    let acc = account.getByToken(req.cookies.get_value("token", ""))
+    if (not acc) return res.redirect("/login")
+    res.template("add.html", {})
+app.get("/addtolist", addToList)
+
+let postAddToList(req,res) = do
+    let acc = account.getByToken(req.cookies.get_value("token", ""))
+    if (not acc) return res.redirect("/login")
+    let title = req.formdata.get_value("title")
+    let price = number(req.formdata.get_value("price"))
+    let link = req.formdata.get_value("link")
+    if ((not title) || (not price) || (not link)) do
+        res.code = 400
+        return res.send("Missing data")
+    christmasList.append({owner: acc.id, bought: null, link: link, title: title, id:randstr(10), price: price})
+    makeChange()
+    res.redirect("/mylist")
+app.post("/addtolist", postAddToList)
