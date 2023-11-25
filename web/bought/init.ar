@@ -16,7 +16,7 @@ let bought(req,res) = do
     if (not item) return res.redirect("/list?"+url.queryStr({limit:string(limit)}))
     if (item.bought) return res.redirect("/list?"+url.queryStr({limit:string(limit)}))
     let person = account.getById(item.owner)
-    res.template("bought.html",{username:person.username, title: item.title, price: string(item.price), link:item.link, personID: person.id, itemID:item.id, backLink:"/list?"+url.queryStr({limit:string(limit)})})
+    res.template("bought.html",{username:person.username, title: item.title, description: item.get_value("description",""), price: string(item.price), link:item.link, personID: person.id, itemID:item.id, backLink:"/list?"+url.queryStr({limit:string(limit)})})
 app.get("/bought", bought)
 
 let postBought(req, res) = do
@@ -43,5 +43,5 @@ let postBought(req, res) = do
         return res.send("Item already bought")
     item.bought = acc.id
     makeChange()
-    return res.template("bought ticked off.html",{username:person.username, title: item.title, price: string(item.price), link:item.link})
+    return res.template("bought ticked off.html",{username:person.username, title: item.title, description: item.get_value("description",""), price: string(item.price), link:item.link})
 app.post("/bought", postBought)

@@ -14,10 +14,10 @@ let postAddToList(req,res) = do
     let title = req.formdata.get_value("title")
     let price = number(req.formdata.get_value("price"))
     let link = req.formdata.get_value("link")
-    if ((not title) || (not price) || (not link)) do
+    if ((not title) || (not price)) do
         res.code = 400
         return res.send("Missing data")
-    christmasList.append({owner: acc.id, bought: null, link: link, title: title, id:randstr(10), price: price})
+    christmasList.append({owner: acc.id, bought: null, link: link, title: title, description:req.formdata.get_value("title"), id:randstr(10), price: price})
     makeChange()
     res.redirect("/mylist")
 app.post("/addtolist", postAddToList)

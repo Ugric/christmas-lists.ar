@@ -1,0 +1,15 @@
+import "server" as *
+import "database" as *
+import "bleach.ar" as bleach
+
+let mylist(req,res) = do
+    let acc = account.getByToken(req.cookies.get_value("token", ""))
+    if (not acc) return res.redirect("/login")
+    let results = []
+    for (i from 0 to christmasList.length) do
+        let item = christmasList[i]
+        let person = account.getById(item.owner)
+        if (acc.id != item.bought) continue
+        results.append("<div class=\"list_item\"><p>"+bleach.clean(person.username)+" wants to get...</p><h1>"+bleach.clean(item.title)+"</h1><p>"+bleach.clean(item.get_value("description", ""))+"</p><h2>£"+bleach.clean(string(item.price))+"</h2><a class=\"link\" href=\""+bleach.clean(item.link)+"\">"+bleach.clean(item.link)+"</a></div>")
+    res.template("what ive bought.html", {results: results.join("")||"you have nothing on your wishlist"})
+app.get("/ivebought", mylist)

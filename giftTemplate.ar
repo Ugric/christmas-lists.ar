@@ -1,4 +1,4 @@
 import "bleach.ar" as bleach
 import "url.ar" as url
 
-let giftTemplate(person, item) = "<div class=\"list_item\"><p>"+bleach.clean(person.username)+" wants to get...</p><h1>"+bleach.clean(item.title)+"</h1><h2>£"+bleach.clean(string(item.price))+"</h2><a class=\"link\" href=\""+bleach.clean(item.link)+"\">"+bleach.clean(item.link)+"</a><a class=\"link\" href=\"/bought?"+url.queryStr({item:item.id})+"\">I've bought this for them!</a></div>"
+let giftTemplate(person, item) = "<div class=\"list_item\"><p>"+bleach.clean(person.username)+" wants to get...</p><h1>"+bleach.clean(item.title)+"</h1><p>"+bleach.clean(item.get_value("description", ""))+"</p><h2>£"+bleach.clean(string(item.price))+"</h2><a class=\"link\" href=\""+bleach.clean(item.link)+"\">"+bleach.clean(item.link)+"</a><a class=\"link\" href=\"/bought?"+url.queryStr({item:item.id})+"\">I've bought this for them!</a></div>"
