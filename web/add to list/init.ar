@@ -17,7 +17,7 @@ let postAddToList(req,res) = do
     if ((not title) || (not price)) do
         res.code = 400
         return res.send("Missing data")
-    christmasList.append({owner: acc.id, bought: null, link: link, title: title, description:req.formdata.get_value("title"), id:randstr(10), price: price})
+    christmasList.append({owner: acc.id, bought: null, link: link, title: title, description:req.formdata.get_value("description"), id:randstr(10), price: price})
     makeChange()
     res.redirect("/mylist")
 app.post("/addtolist", postAddToList)
