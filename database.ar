@@ -132,7 +132,15 @@ for (i from 0 to users.length) do
     let user = users[i]
     let acc = account.getByUsername(user)
     if (acc == null) do
-        let password = makePassword(3)
+        let password = null
+        forever do
+            password = makePassword(3)
+            let used = false
+            for (i from 0 to users.length) do
+                if (users[i] == password) do
+                    used = true
+                    break
+            if (not used) break
         acc = account.create(user, password)
         term.log("Created account",user)
         term.log("Password:",password)
