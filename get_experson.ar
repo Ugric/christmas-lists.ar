@@ -1,0 +1,13 @@
+import "database" as db
+
+exPerson = input("Enter the name of the person you want to exclude: ")
+
+let dataExPerson = []
+
+for (i from 0 to db.christmasList.length) do
+    let item = db.christmasList[i]
+    let person = db.account.getById(item.owner)
+    if (person.username != exPerson) do
+        dataExPerson.append(item)
+
+term.log(dataExPerson)
