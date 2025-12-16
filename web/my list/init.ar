@@ -10,6 +10,6 @@ let mylist(req,res) = do
         let item = christmasList[i]
         let person = account.getById(item.owner)
         if (person.id != acc.id) continue
-        results.append("<div class=\"list_item\"><h1>"+bleach.clean(item.title)+"</h1><p>"+bleach.clean(item.get_value("description", ""))+"</p><h2>£"+bleach.clean(string(item.price))+"</h2><a class=\"link\" href=\""+bleach.clean(item.link)+"\">"+bleach.clean(item.link)+"</a></div>")
+        results.append("<div class=\"list_item\"><h1>"+bleach.clean(item.title)+"</h1><pre>"+bleach.clean(item.get_value("description", ""))+"</pre><h2>£"+bleach.clean(string(item.price))+"</h2><a class=\"link\" href=\""+bleach.clean(item.link)+"\">"+bleach.clean(item.link)+"</a></div>")
     res.template("mylist.html", {results: results.join("")||"you have nothing on your wishlist"})
 app.get("/mylist", mylist)
