@@ -11,5 +11,5 @@ let mylist(req,res) = do
         let person = account.getById(item.owner)
         if (acc.id != item.bought) continue
         results.append("<div class=\"list_item\"><p>"+bleach.clean(person.username)+" wants to get...</p><h1>"+bleach.clean(item.title)+"</h1><pre style=\"text-wrap: auto;\">"+bleach.clean(item.get_value("description", ""))+"</pre><h2>£"+bleach.clean(string(item.price))+"</h2><a class=\"link\" href=\""+bleach.clean(item.link)+"\">"+bleach.clean(item.link)+"</a></div>")
-    res.template("what ive bought.html", {results: results.join("")||"you have nothing on your wishlist"})
+    res.template("what ive bought.html", {results: results.join("")||"you have not marked any items as bought yet"})
 app.get("/ivebought", mylist)
